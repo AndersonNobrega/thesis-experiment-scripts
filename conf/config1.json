@@ -1,0 +1,11 @@
+{
+    "_comment": "This file is created by hand and must match values in sub-disaggregators. only feature_normalization is important",
+    "stacks": 1,
+    "depth": 9,
+    "sample_size": 1440,
+    "feature_normalization": [
+      16384.0,
+      4096.0
+    ]
+  }
+  
