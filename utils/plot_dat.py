@@ -9,7 +9,7 @@ import seaborn as sns
 custom = {"axes.edgecolor": "black"}
 sns.set_style("whitegrid", rc=custom)
 
-file = open('/home/anderson/code_projects/mestrado/data/casa_jefferson/casa_jefferson_train.dat', 'rb')
+file = open('/home/anderson/parameters_results/simple_eval/experiment_no_args_run1/spec/train_ar_condicionado.dat', 'rb')
 arr = pickle.load(file)
 
 print(arr.shape)
@@ -17,13 +17,6 @@ print(arr.shape)
 max_value = arr[:, 1, 0].max()
 
 plt.subplots(figsize=(12, 8))
-
-# dates=[dt.datetime.fromtimestamp(ts) for ts in arr[:, 0, 0]]
-# datenums=md.date2num(dates)
-
-# ax = plt.gca()
-# xfmt = md.DateFormatter('%Y-%m-%d %H:%M:%S')
-# ax.xaxis.set_major_formatter(xfmt)
 
 plt.subplot(211)
 plt.ylabel("Consumo - Potência Ativa (W)")
