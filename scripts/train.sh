@@ -18,6 +18,19 @@ elif [[ "$1" == "--hard_eval" ]]; then
     EVAL_TYPE="hard_eval"
 fi
 
+# Set config filenames based on EVAL_TYPE
+if [[ "$EVAL_TYPE" == "hard_eval" ]]; then
+    RESIDENCIAL_CONF_1="residencial1_1.conf"
+    RESIDENCIAL_CONF_2="residencial1_2.conf"
+    CONFIG_JSON_1="config1_1.json"
+    CONFIG_JSON_2="config1_2.json"
+else
+    RESIDENCIAL_CONF_1="residencial2_1.conf"
+    RESIDENCIAL_CONF_2="residencial2_2.conf"
+    CONFIG_JSON_1="config2_1.json"
+    CONFIG_JSON_2="config2_2.json"
+fi
+
 # Environment and path settings
 CURRENT_SCRIPT_PATH="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PROJECT_PATH="$(cd "$CURRENT_SCRIPT_PATH/.." && pwd)"
@@ -31,8 +44,7 @@ mkdir -p "$RESULTS_BASE_DIR"
 
 # Define the three augmentation method arguments.
 # (They are passed to data_aug_methods.py as is.)
-# augmentation_methods=("" --synthetic_modelling --random_assign --merged)
-augmentation_methods=("")
+augmentation_methods=("" --synthetic_modelling --random_assign --merged)
 
 # Loop over each augmentation method
 for method in "${augmentation_methods[@]}"; do
@@ -41,10 +53,11 @@ for method in "${augmentation_methods[@]}"; do
     method_name=${method_name:-"no_args"}
     echo "Processing augmentation method: $method_name"
 
-    if [ "$method_name" == "no_args" ] ; then
-        cp "$PROJECT_PATH/conf/residencial1_1.conf" "$HOME/envs/set-nialm3/configs/individual_appliances/residencial/residencial_default.conf"
+    # Select correct residencial config
+    if [ "$method_name" == "no_args" ]; then
+        cp "$PROJECT_PATH/conf/$RESIDENCIAL_CONF_1" "$SET_PATH/configs/individual_appliances/residencial/residencial_default.conf"
     else
-        cp "$PROJECT_PATH/conf/residencial1_2.conf" "$HOME/envs/set-nialm3/configs/individual_appliances/residencial/residencial_default.conf"
+        cp "$PROJECT_PATH/conf/$RESIDENCIAL_CONF_2" "$SET_PATH/configs/individual_appliances/residencial/residencial_default.conf"
     fi
 
     # Create an aggregated eval result file for this method
@@ -54,9 +67,9 @@ for method in "${augmentation_methods[@]}"; do
 
     # Copy appropriate config file
     if [ "$method_name" == "random_assign" ] || [ "$method_name" == "no_args" ] || [ "$method_name" == "signal_transform" ]; then
-        cp "$PROJECT_PATH/conf/config1_1.json" "$HOME/envs/set-nialm3/keras_disaggregators/tests/individual_appliances/residencial/residencial/config.json"
+        cp "$PROJECT_PATH/conf/$CONFIG_JSON_1" "$SET_PATH/keras_disaggregators/tests/individual_appliances/residencial/residencial/config.json"
     else
-        cp "$PROJECT_PATH/conf/config1_2.json" "$HOME/envs/set-nialm3/keras_disaggregators/tests/individual_appliances/residencial/residencial/config.json"
+        cp "$PROJECT_PATH/conf/$CONFIG_JSON_2" "$SET_PATH/keras_disaggregators/tests/individual_appliances/residencial/residencial/config.json"
     fi
 
     # Run three iterations for the current augmentation method
