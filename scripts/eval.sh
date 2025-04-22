@@ -94,6 +94,8 @@ for method in "${augmentation_methods[@]}"; do
         (cd "$SET_PATH" && scripts/nialm_gen.sh -v --eval configs/individual_appliances/residencial/residencial.conf) >> "$AGG_RESULT_FILE"
         echo -e "\n#### RUN $run COMPLETED ####\n" >> "$AGG_RESULT_FILE"
 
+        cp -r "$HOME/temp/"*.dat "$EXPERIMENT_FOLDER/dat/"
+
         echo "Completed run $run for method '$method_name'. Results stored in $EXPERIMENT_FOLDER and appended to $AGG_RESULT_FILE"
     done
 done

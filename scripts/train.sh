@@ -39,7 +39,7 @@ SET_PATH="$HOME/envs/set-nialm3"
 EVAL_BASE_PATH="$HOME/temp/individual_appliances/residencial/"
 
 # Base directory for storing results
-RESULTS_BASE_DIR="$HOME/parameters_results/$EVAL_TYPE"
+RESULTS_BASE_DIR="$PROJECT_PATH/results/$EVAL_TYPE"
 mkdir -p "$RESULTS_BASE_DIR"
 
 # Define the three augmentation method arguments.
@@ -60,11 +60,6 @@ for method in "${augmentation_methods[@]}"; do
         cp "$PROJECT_PATH/conf/$RESIDENCIAL_CONF_2" "$SET_PATH/configs/individual_appliances/residencial/residencial_default.conf"
     fi
 
-    # Create an aggregated eval result file for this method
-    AGG_RESULT_FILE="${RESULTS_BASE_DIR}/experiment_${method_name}_eval_results.txt"
-    # Empty (or create) the aggregated results file
-    : > "$AGG_RESULT_FILE"
-
     # Copy appropriate config file
     if [ "$method_name" == "random_assign" ] || [ "$method_name" == "no_args" ] || [ "$method_name" == "signal_transform" ]; then
         cp "$PROJECT_PATH/conf/$CONFIG_JSON_1" "$SET_PATH/keras_disaggregators/tests/individual_appliances/residencial/residencial/config.json"
@@ -81,22 +76,25 @@ for method in "${augmentation_methods[@]}"; do
         # Run the data augmentation method script.
         nialm_env
         if [ -z "$method" ]; then
-            python3 "data_aug_methods_hard.py"
+            python3 "$PROJECT_PATH/data_aug.py" "--$EVAL_TYPE"
         else
-            python3 "data_aug_methods_hard.py" "$method"
+            python3 "$PROJECT_PATH/data_aug.py" "--$method_name" "--$EVAL_TYPE"
         fi
         deactivate_env
 
         EXPERIMENT_TAG="experiment_${method_name}_run${run}"
         EXPERIMENT_FOLDER="${RESULTS_BASE_DIR}/${EXPERIMENT_TAG}"
-        EXPERIMENT_MODEL_CONFIG="${EXPERIMENT_FOLDER}/model"
+        mkdir -p "$EXPERIMENT_FOLDER/dat" "$EXPERIMENT_FOLDER/model" "$EXPERIMENT_FOLDER/spec"
 
         # Run training for each individual appliance configuration
         (cd "$SET_PATH" && scripts/nialm_gen.sh -v --train "$EXPERIMENT_TAG" configs/individual_appliances/residencial/ar_condicionado.conf)
         (cd "$SET_PATH" && scripts/nialm_gen.sh -v --train "$EXPERIMENT_TAG" configs/individual_appliances/residencial/refrigerador.conf)
         (cd "$SET_PATH" && scripts/nialm_gen.sh -v --train "$EXPERIMENT_TAG" configs/individual_appliances/residencial/chuveiro.conf)
 
-        echo "Completed run $run for method '$method_name'. Results stored in $EXPERIMENT_FOLDER and appended to $AGG_RESULT_FILE"
+        cp -r "$HOME/temp/individual_appliances/residencial/"*"/" "$EXPERIMENT_FOLDER/model/"
+        cp -r "$HOME/temp/individual_appliances/residencial/"*.dat "$EXPERIMENT_FOLDER/spec/"
+
+        echo "Completed training run $run for method '$method_name'. Results stored in $EXPERIMENT_FOLDER"
     done
 done
 

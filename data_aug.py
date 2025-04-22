@@ -224,8 +224,11 @@ def get_args() -> Namespace:
 
 def main() -> None:
     args = get_args()
+    eval_mode = "simple_eval" if args.simple_eval else "hard_eval"
     house_files = HOUSE_FILES_SIMPLE if args.simple_eval else HOUSE_FILES_HARD
     repeat_factor = FACTOR_BY_HOUSE_SIMPLE if args.simple_eval else FACTOR_BY_HOUSE_HARD
+    
+    print(f"Running in {eval_mode} mode.")
 
     aggregator = DataAggregator(house_files, repeat_factor)
     if args.synthetic_modelling:
