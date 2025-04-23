@@ -1,15 +1,23 @@
+import argparse
+import json
 import re
-import numpy as np
+from statistics import mean
+from pathlib import Path
 
-from pprint import pprint
+# List of subscenario identifiers to collect
+SUBSCENARIOS = [
+    "casa_diego",
+    "casa_andrey",
+    "casa_anderson",
+    "casa_leandro",
+    "casa_igor",
+]
 
-# File path
-file_path = (
-    "/home/anderson/parameters_results/hard_eval/experiment_merged_eval_results.txt"
-)
+# Regex to identify subscenario lines
+SUB_PATTERN = re.compile(r"Subsc?enario:\s*(\w+)", re.IGNORECASE)
 
-# Define regex patterns for extracting the required metrics
-patterns = {
+# Patterns for all required metrics
+PATTERNS = {
     "total_accuracy": re.compile(r"estimated accuracy \(window size 1\): ([\d\.]+)%"),
     "total_ar_condicionado": re.compile(r"appliance ar_condicionado: ([\d\.]+)%"),
     "total_chuveiro": re.compile(r"appliance chuveiro: ([\d\.]+)%"),
@@ -23,53 +31,78 @@ patterns = {
     "f1score_refrigerador": re.compile(
         r"appliance refrigerador - precision: [\d\.]+%, recall: [\d\.]+%, f1score: ([\d\.]+)%"
     ),
-    "precision_ar_condicionado": re.compile(
-        r"appliance ar_condicionado - precision: ([\d\.]+)%"
-    ),
+    "precision_ar_condicionado": re.compile(r"appliance ar_condicionado - precision: ([\d\.]+)%"),
     "precision_chuveiro": re.compile(r"appliance chuveiro - precision: ([\d\.]+)%"),
-    "precision_refrigerador": re.compile(
-        r"appliance refrigerador - precision: ([\d\.]+)%"
-    ),
-    "recall_ar_condicionado": re.compile(
-        r"appliance ar_condicionado - precision: [\d\.]+%, recall: ([\d\.]+)%"
-    ),
-    "recall_chuveiro": re.compile(
-        r"appliance chuveiro - precision: [\d\.]+%, recall: ([\d\.]+)%"
-    ),
-    "recall_refrigerador": re.compile(
-        r"appliance refrigerador - precision: [\d\.]+%, recall: ([\d\.]+)%"
-    ),
+    "precision_refrigerador": re.compile(r"appliance refrigerador - precision: ([\d\.]+)%"),
+    "recall_ar_condicionado": re.compile(r"appliance ar_condicionado - precision: [\d\.]+%, recall: ([\d\.]+)%"),
+    "recall_chuveiro": re.compile(r"appliance chuveiro - precision: [\d\.]+%, recall: ([\d\.]+)%"),
+    "recall_refrigerador": re.compile(r"appliance refrigerador - precision: [\d\.]+%, recall: ([\d\.]+)%"),
 }
 
-# Containers for metrics per subscenario
-metrics = {
-    "casa_diego": {key: [] for key in patterns},
-    "casa_andrey": {key: [] for key in patterns},
-}
+def process_file(txt_path: Path) -> dict:
+    """
+    Extract metrics from a single .txt file and compute averages per subscenario.
+    """
+    metrics = {
+        sub: {key: [] for key in PATTERNS}
+        for sub in SUBSCENARIOS
+    }
 
-# Read file and extract values
-with open(file_path, "r") as file:
-    current_subscenario = None
-    for line in file:
-        # Identify subscenario
-        if "Subcenario:  casa_diego" in line:
-            current_subscenario = "casa_diego"
-        elif "Subcenario:  casa_andrey" in line:
-            current_subscenario = "casa_andrey"
-        elif "Subscenario: casa_tipo1" in line:
-            current_subscenario = None
+    with txt_path.open('r') as file:
+        current_subscenario = None
+        for line in file:
+            if "Subcenario:  casa_diego" in line:
+                current_subscenario = "casa_diego"
+            elif "Subcenario:  casa_andrey" in line:
+                current_subscenario = "casa_andrey"
+            elif "Subcenario:  casa_anderson" in line:
+                current_subscenario = "casa_anderson"
+            elif "Subcenario:  casa_igor" in line:
+                current_subscenario = "casa_igor"
+            elif "Subcenario:  casa_leandro" in line:
+                current_subscenario = "casa_leandro"
+            elif "Subscenario: casa_tipo1" in line:
+                current_subscenario = None
 
-        # Extract metrics if in relevant subscenario
-        if current_subscenario:
-            for key, pattern in patterns.items():
-                match = pattern.search(line)
-                if match:
-                    metrics[current_subscenario][key].append(np.float64(match.group(1)))
+            if current_subscenario:
+                for key, pattern in PATTERNS.items():
+                    match_val = pattern.search(line)
+                    if match_val:
+                        metrics[current_subscenario][key].append(float(match_val.group(1)))
 
-# Compute averages
-averages = {
-    scenario: {metric: np.round(np.mean(values), 2) for metric, values in data.items()}
-    for scenario, data in metrics.items()
-}
+    averages = {
+        sub: {
+            metric: round(mean(values), 2) if values else None
+            for metric, values in data.items()
+        }
+        for sub, data in metrics.items()
+    }
+    
+    return averages
 
-pprint(averages)
+
+def main():
+    parser = argparse.ArgumentParser(
+        description="Process .txt result files to extract and average metrics per subscenario."
+    )
+    parser.add_argument(
+        '--dir',
+        type=Path,
+        help='Path to directory containing .txt result files'
+    )
+    args = parser.parse_args()
+
+    if not args.dir.is_dir():
+        parser.error(f"Path '{args.dir}' is not a directory.")
+
+    for txt_file in args.dir.glob('*.txt'):
+        print(f"Processing: {txt_file.name}")
+        averages = process_file(txt_file)
+
+        out_path = txt_file.with_suffix('.json')
+        with out_path.open('w') as out_f:
+            json.dump(averages, out_f, indent=2)
+        print(f"Written: {out_path.name}\n")
+
+if __name__ == '__main__':
+    main()
