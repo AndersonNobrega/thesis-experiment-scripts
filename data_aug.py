@@ -12,6 +12,7 @@ Evaluation splits:
   * hard_eval (default): uses data from three houses.
   * simple_eval: uses data from five houses.
 """
+
 from argparse import ArgumentParser, ArgumentDefaultsHelpFormatter, Namespace
 from datetime import datetime
 from pathlib import Path
@@ -21,11 +22,12 @@ import os
 import pickle
 import numpy as np
 
+from utils.paths import HOME_PATH, DATA_PATH
 
 HOUSE_FILES_HARD = {
-    "casa_igor": Path("data/casa_igor/casa_igor_train.dat"),
-    "casa_anderson": Path("data/casa_anderson/casa_anderson_train.dat"),
-    "casa_leandro": Path("data/casa_leandro/casa_leandro_train.dat"),
+    "casa_igor": DATA_PATH.joinpath("./casa_igor/casa_igor_train.dat"),
+    "casa_anderson": DATA_PATH.joinpath("./casa_anderson/casa_anderson_train.dat"),
+    "casa_leandro": DATA_PATH.joinpath("./casa_leandro/casa_leandro_train.dat"),
 }
 
 FACTOR_BY_HOUSE_HARD = {
@@ -37,11 +39,11 @@ FACTOR_BY_HOUSE_HARD = {
 }
 
 HOUSE_FILES_SIMPLE = {
-    "casa_andrey": Path("data/casa_andrey/casa_andrey_train.dat"),
-    "casa_igor": Path("data/casa_igor/casa_igor_train.dat"),
-    "casa_anderson": Path("data/casa_anderson/casa_anderson_train.dat"),
-    "casa_leandro": Path("data/casa_leandro/casa_leandro_train.dat"),
-    "casa_diego": Path("data/casa_diego/casa_diego_train.dat"),
+    "casa_andrey": DATA_PATH.joinpath("./casa_andrey/casa_andrey_train.dat"),
+    "casa_igor": DATA_PATH.joinpath("./casa_igor/casa_igor_train.dat"),
+    "casa_anderson": DATA_PATH.joinpath("./casa_anderson/casa_anderson_train.dat"),
+    "casa_leandro": DATA_PATH.joinpath("./casa_leandro/casa_leandro_train.dat"),
+    "casa_diego": DATA_PATH.joinpath("./casa_diego/casa_diego_train.dat"),
 }
 
 FACTOR_BY_HOUSE_SIMPLE = {
@@ -55,20 +57,20 @@ FACTOR_BY_HOUSE_SIMPLE = {
 }
 
 SYNTHETIC_FILES = {
-    "ar_condicionado": Path("data/casa_simulada/train_ar_condicionado.dat"),
-    "chuveiro": Path("data/casa_simulada/train_chuveiro.dat"),
-    "refrigerador": Path("data/casa_simulada/train_refrigerador.dat"),
+    "ar_condicionado": DATA_PATH.joinpath("./casa_simulada/train_ar_condicionado.dat"),
+    "chuveiro": DATA_PATH.joinpath("./casa_simulada/train_chuveiro.dat"),
+    "refrigerador": DATA_PATH.joinpath("./casa_simulada/train_refrigerador.dat"),
 }
 
 OUTPUT_FILES = {
-    "ar_condicionado": Path(
-        "/home/anderson/temp/individual_appliances/residencial/train_ar_condicionado.dat"
+    "ar_condicionado": HOME_PATH.joinpath(
+        "./temp/individual_appliances/residencial/train_ar_condicionado.dat"
     ),
-    "chuveiro": Path(
-        "/home/anderson/temp/individual_appliances/residencial/train_chuveiro.dat"
+    "chuveiro": HOME_PATH.joinpath(
+        "./temp/individual_appliances/residencial/train_chuveiro.dat"
     ),
-    "refrigerador": Path(
-        "/home/anderson/temp/individual_appliances/residencial/train_refrigerador.dat"
+    "refrigerador": HOME_PATH.joinpath(
+        "./temp/individual_appliances/residencial/train_refrigerador.dat"
     ),
 }
 
@@ -123,7 +125,7 @@ class DataAggregator:
                     expanded[idx] = [
                         [self._base_timestamp, self._base_timestamp],
                         row[1],
-                        row[2]
+                        row[2],
                     ]
                 else:
                     expanded[idx] = row
@@ -227,7 +229,7 @@ def main() -> None:
     eval_mode = "simple_eval" if args.simple_eval else "hard_eval"
     house_files = HOUSE_FILES_SIMPLE if args.simple_eval else HOUSE_FILES_HARD
     repeat_factor = FACTOR_BY_HOUSE_SIMPLE if args.simple_eval else FACTOR_BY_HOUSE_HARD
-    
+
     print(f"Running in {eval_mode} mode.")
 
     aggregator = DataAggregator(house_files, repeat_factor)

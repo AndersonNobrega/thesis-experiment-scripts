@@ -31,24 +31,32 @@ PATTERNS = {
     "f1score_refrigerador": re.compile(
         r"appliance refrigerador - precision: [\d\.]+%, recall: [\d\.]+%, f1score: ([\d\.]+)%"
     ),
-    "precision_ar_condicionado": re.compile(r"appliance ar_condicionado - precision: ([\d\.]+)%"),
+    "precision_ar_condicionado": re.compile(
+        r"appliance ar_condicionado - precision: ([\d\.]+)%"
+    ),
     "precision_chuveiro": re.compile(r"appliance chuveiro - precision: ([\d\.]+)%"),
-    "precision_refrigerador": re.compile(r"appliance refrigerador - precision: ([\d\.]+)%"),
-    "recall_ar_condicionado": re.compile(r"appliance ar_condicionado - precision: [\d\.]+%, recall: ([\d\.]+)%"),
-    "recall_chuveiro": re.compile(r"appliance chuveiro - precision: [\d\.]+%, recall: ([\d\.]+)%"),
-    "recall_refrigerador": re.compile(r"appliance refrigerador - precision: [\d\.]+%, recall: ([\d\.]+)%"),
+    "precision_refrigerador": re.compile(
+        r"appliance refrigerador - precision: ([\d\.]+)%"
+    ),
+    "recall_ar_condicionado": re.compile(
+        r"appliance ar_condicionado - precision: [\d\.]+%, recall: ([\d\.]+)%"
+    ),
+    "recall_chuveiro": re.compile(
+        r"appliance chuveiro - precision: [\d\.]+%, recall: ([\d\.]+)%"
+    ),
+    "recall_refrigerador": re.compile(
+        r"appliance refrigerador - precision: [\d\.]+%, recall: ([\d\.]+)%"
+    ),
 }
+
 
 def process_file(txt_path: Path) -> dict:
     """
     Extract metrics from a single .txt file and compute averages per subscenario.
     """
-    metrics = {
-        sub: {key: [] for key in PATTERNS}
-        for sub in SUBSCENARIOS
-    }
+    metrics = {sub: {key: [] for key in PATTERNS} for sub in SUBSCENARIOS}
 
-    with txt_path.open('r') as file:
+    with txt_path.open("r") as file:
         current_subscenario = None
         for line in file:
             if "Subcenario:  casa_diego" in line:
@@ -68,7 +76,9 @@ def process_file(txt_path: Path) -> dict:
                 for key, pattern in PATTERNS.items():
                     match_val = pattern.search(line)
                     if match_val:
-                        metrics[current_subscenario][key].append(float(match_val.group(1)))
+                        metrics[current_subscenario][key].append(
+                            float(match_val.group(1))
+                        )
 
     averages = {
         sub: {
@@ -77,7 +87,7 @@ def process_file(txt_path: Path) -> dict:
         }
         for sub, data in metrics.items()
     }
-    
+
     return averages
 
 
@@ -86,23 +96,22 @@ def main():
         description="Process .txt result files to extract and average metrics per subscenario."
     )
     parser.add_argument(
-        '--dir',
-        type=Path,
-        help='Path to directory containing .txt result files'
+        "--dir", type=Path, help="Path to directory containing .txt result files"
     )
     args = parser.parse_args()
 
     if not args.dir.is_dir():
         parser.error(f"Path '{args.dir}' is not a directory.")
 
-    for txt_file in args.dir.glob('*.txt'):
+    for txt_file in args.dir.glob("*.txt"):
         print(f"Processing: {txt_file.name}")
         averages = process_file(txt_file)
 
-        out_path = txt_file.with_suffix('.json')
-        with out_path.open('w') as out_f:
+        out_path = txt_file.with_suffix(".json")
+        with out_path.open("w") as out_f:
             json.dump(averages, out_f, indent=2)
         print(f"Written: {out_path.name}\n")
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     main()

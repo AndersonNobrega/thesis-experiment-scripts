@@ -4,34 +4,47 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 import numpy as np
 import pandas as pd
-import sys
+from paths import PLOTS_PATH, RESULT_PATH
 
 
 def plot_consumption(house, day):
     sns.set_theme(style="whitegrid", palette="muted", rc={"axes.edgecolor": "black"})
 
     # Load ground truth
-    with open(f"/home/anderson/temp/casa_{house}.dat", "rb") as f:
+    with open(
+        RESULT_PATH.joinpath(
+            f"./hard_eval/experiment_merged_run3/dat/casa_{house}.dat"
+        ).as_posix(),
+        "rb",
+    ) as f:
         arr_gt = pickle.load(f)
 
     # Load predictions
     with open(
-        f"/home/anderson/parameters_results/experiment_merged_run3/dat/casa_{house}_predicted.dat",
+        RESULT_PATH.joinpath(
+            f"./hard_eval/experiment_merged_run3/dat/casa_{house}_predicted.dat"
+        ).as_posix(),
         "rb",
     ) as f:
         arr1 = pickle.load(f)
     with open(
-        f"/home/anderson/parameters_results/experiment_no_args_run3/dat/casa_{house}_predicted.dat",
+        RESULT_PATH.joinpath(
+            f"./hard_eval/experiment_no_args_run3/dat/casa_{house}_predicted.dat"
+        ).as_posix(),
         "rb",
     ) as f:
         arr2 = pickle.load(f)
     with open(
-        f"/home/anderson/parameters_results/experiment_random_assign_run3/dat/casa_{house}_predicted.dat",
+        RESULT_PATH.joinpath(
+            f"./hard_eval/experiment_random_assign_run3/dat/casa_{house}_predicted.dat"
+        ).as_posix(),
         "rb",
     ) as f:
         arr3 = pickle.load(f)
     with open(
-        f"/home/anderson/parameters_results/experiment_synthetic_modelling_run3/dat/casa_{house}_predicted.dat",
+        RESULT_PATH.joinpath(
+            f"./hard_eval/experiment_synthetic_modelling_run3/dat/casa_{house}_predicted.dat"
+        ).as_posix(),
         "rb",
     ) as f:
         arr4 = pickle.load(f)
@@ -111,8 +124,10 @@ def plot_consumption(house, day):
     )
 
     plt.tight_layout()
-    plt.suptitle("Predictions vs Ground Truth per Appliance", fontsize=16, y=1.02)
-    plt.show()
+    plt.savefig(
+        PLOTS_PATH.joinpath(f"./predictions_{house}.png").as_posix(),
+        bbox_inches="tight",
+    )
 
 
 parser = argparse.ArgumentParser(
