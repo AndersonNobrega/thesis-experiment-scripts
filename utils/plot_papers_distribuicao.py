@@ -16,7 +16,7 @@ def compute_trendline(x_values, y_values, degree=2):
     return np.polyval(coefficients, x_values)
 
 def create_distribution_plot(years, counts, trendline, width, output_path):
-    fig, ax = plt.subplots(figsize=(10, 6))
+    _, ax = plt.subplots(figsize=(10, 6))
     ax.grid(True, zorder=0)
 
     ax.bar(years, counts, width, edgecolor='black', zorder=3)

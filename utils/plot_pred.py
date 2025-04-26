@@ -128,6 +128,7 @@ def plot_consumption(house, day):
         PLOTS_PATH.joinpath(f"./predictions_{house}.png").as_posix(),
         bbox_inches="tight",
     )
+    plt.close()
 
 
 parser = argparse.ArgumentParser(

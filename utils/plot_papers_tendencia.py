@@ -19,8 +19,7 @@ WEIGHT_COUNTS = {
     "Reviews": np.array([0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 1, 0, 2]),
 }
 
-def setup_plot_style():
-    sns.set_theme(style="whitegrid", palette="muted", rc={"axes.edgecolor": "black"})
+sns.set_theme(style="whitegrid", palette="muted", rc={"axes.edgecolor": "black"})
 
 def calculate_total_weight(weight_counts):
     total = sum(sum(weight_counts[key]) for key in weight_counts)
@@ -29,7 +28,7 @@ def calculate_total_weight(weight_counts):
     print(f"Total: {total}")
 
 def create_stacked_bar_plot(years, weight_counts, width, output_path):
-    fig, ax = plt.subplots(figsize=(10, 6))
+    _, ax = plt.subplots(figsize=(10, 6))
     ax.grid(True, zorder=0)
     bottom = np.zeros(len(years))
 
@@ -50,7 +49,6 @@ def create_stacked_bar_plot(years, weight_counts, width, output_path):
     plt.close()
 
 def main():
-    setup_plot_style()
     calculate_total_weight(WEIGHT_COUNTS)
     create_stacked_bar_plot(YEARS, WEIGHT_COUNTS, WIDTH, OUTPUT_FILE)
 
