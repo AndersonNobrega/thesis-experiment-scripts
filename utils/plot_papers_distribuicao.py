@@ -28,7 +28,7 @@ def create_distribution_plot(years, counts, trendline, width, output_path):
     ax.yaxis.set_major_locator(plt.MaxNLocator(integer=True))
 
     plt.tight_layout()
-    plt.savefig(output_path.as_posix(), bbox_inches='tight')
+    plt.savefig(output_path.as_posix(), dpi=300, bbox_inches='tight')
     plt.close()
 
 def main():

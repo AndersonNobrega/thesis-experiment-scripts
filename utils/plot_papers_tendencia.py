@@ -45,7 +45,7 @@ def create_stacked_bar_plot(years, weight_counts, width, output_path):
     ax.legend(loc="upper left")
 
     plt.tight_layout()
-    plt.savefig(output_path.as_posix(), bbox_inches="tight")
+    plt.savefig(output_path.as_posix(), dpi=300, bbox_inches="tight")
     plt.close()
 
 def main():

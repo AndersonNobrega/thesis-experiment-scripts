@@ -9,6 +9,7 @@ from paths import PLOTS_PATH, RESULT_PATH
 
 
 sns.set_theme(style="whitegrid", palette="muted", rc={"axes.edgecolor": "black"})
+PLOT_FIGSIZE = (19.2, 10.8)
 
 def plot_consumption(house: str, day: int, eval_mode: str) -> None:
     # Load ground truth
@@ -58,7 +59,7 @@ def plot_consumption(house: str, day: int, eval_mode: str) -> None:
 
     ground_truth_color = "#181a1c"
 
-    fig, axes = plt.subplots(2, 2, figsize=(19.2, 10.8), sharex=True)
+    fig, axes = plt.subplots(2, 2, figsize=PLOT_FIGSIZE, sharex=True)
     axes = axes.flatten()
 
     for ax, idx in zip(axes, indexes):
@@ -127,6 +128,7 @@ def plot_consumption(house: str, day: int, eval_mode: str) -> None:
     plt.tight_layout()
     plt.savefig(
         PLOTS_PATH.joinpath(f"./predictions_{house}_{eval_mode}.png").as_posix(),
+        dpi=300,
         bbox_inches="tight",
     )
     plt.close()
