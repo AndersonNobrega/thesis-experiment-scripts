@@ -56,7 +56,7 @@ def plot_overlapped_histograms(input_files):
     plt.ylim(0, 1 + MAX_Y_LIMIT_BUFFER)
     plt.title("Overlapped Normalized Histogram Curves")
     plt.legend()
-    plt.grid(True, zorder=0)
+    plt.grid(axis="x", zorder=0)
     plt.tight_layout()
     plt.show()
 

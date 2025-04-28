@@ -27,7 +27,7 @@ def plot_overlapped_lines(input_files):
     plt.ylim(0.5, 1)
     plt.title("Overlapped Line Plot from CSV Files")
     plt.legend()
-    plt.grid(True)
+    plt.grid(axis="x")
     plt.tight_layout()
     plt.show()
 

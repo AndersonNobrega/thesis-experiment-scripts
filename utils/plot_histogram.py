@@ -10,8 +10,9 @@ INPUT_FILES = {
     "Synthetic": "results/tensorboard/ar_conditioner_train/histgrams/kernel/synthetic.json",
 }
 PLOT_FIGSIZE = (16, 12)
-MAX_Y_LIMIT_BUFFER = 0.05
+MAX_LIMIT_BUFFER = 0.05  # 5% buffer
 
+# Set seaborn theme
 sns.set_theme(style="whitegrid", palette="muted", rc={"axes.edgecolor": "black"})
 
 def load_data(file_path):
@@ -20,24 +21,35 @@ def load_data(file_path):
     return data[0][2]
 
 def process_bin_data(bin_data):
-    bin_data.sort(key=lambda x: x[0])
+    bin_data.sort(key=lambda x: x[0])  # Sort by bin start
     bin_centers = [(start + end) / 2 for start, end, _ in bin_data]
     values = [val for _, _, val in bin_data]
     return bin_centers, values
 
 def plot_histograms(input_files):
-    all_values = []
+    all_x = []
+    all_y = []
     processed_data = {}
 
+    # Load and process all data
     for title, file_path in input_files.items():
         bin_data = load_data(file_path)
         bin_centers, values = process_bin_data(bin_data)
         processed_data[title] = (bin_centers, values)
-        all_values.extend(values)
+        all_x.extend(bin_centers)
+        all_y.extend(values)
 
-    max_y_value = max(all_values)
-    y_limit = max_y_value + MAX_Y_LIMIT_BUFFER * max_y_value
+    # Determine symmetric x-limits centered at 0
+    max_abs_x = max(abs(min(all_x)), abs(max(all_x)))
+    max_abs_x *= (1 + MAX_LIMIT_BUFFER)  # add buffer
 
+    xlim = (-max_abs_x, max_abs_x)
+
+    # Determine y-limits
+    max_y = max(all_y)
+    ylim = (0, max_y * (1 + MAX_LIMIT_BUFFER))
+
+    # Plotting
     fig, axes = plt.subplots(2, 2, figsize=PLOT_FIGSIZE)
     axes = axes.flatten()
 
@@ -47,8 +59,9 @@ def plot_histograms(input_files):
         ax.set_title(title)
         ax.set_xlabel("Values")
         ax.set_ylabel("Frequency")
-        ax.set_ylim(0, y_limit)
-        ax.grid(True, axis='x', zorder=0)
+        ax.set_xlim(xlim)
+        ax.set_ylim(ylim)
+        ax.grid(axis='x', zorder=0)
 
     plt.tight_layout()
     plt.show()
