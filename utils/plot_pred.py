@@ -1,19 +1,20 @@
-import argparse
+
 import pickle
 import matplotlib.pyplot as plt
 import seaborn as sns
 import numpy as np
 import pandas as pd
+from argparse import ArgumentDefaultsHelpFormatter, ArgumentParser, Namespace
 from paths import PLOTS_PATH, RESULT_PATH
 
 
-def plot_consumption(house, day):
-    sns.set_theme(style="whitegrid", palette="muted", rc={"axes.edgecolor": "black"})
+sns.set_theme(style="whitegrid", palette="muted", rc={"axes.edgecolor": "black"})
 
+def plot_consumption(house: str, day: int, eval_mode: str) -> None:
     # Load ground truth
     with open(
         RESULT_PATH.joinpath(
-            f"./hard_eval/experiment_merged_run3/dat/casa_{house}.dat"
+            f"./{eval_mode}/experiment_merged_run3/dat/casa_{house}.dat"
         ).as_posix(),
         "rb",
     ) as f:
@@ -22,28 +23,28 @@ def plot_consumption(house, day):
     # Load predictions
     with open(
         RESULT_PATH.joinpath(
-            f"./hard_eval/experiment_merged_run3/dat/casa_{house}_predicted.dat"
+            f"./{eval_mode}/experiment_merged_run3/dat/casa_{house}_predicted.dat"
         ).as_posix(),
         "rb",
     ) as f:
         arr1 = pickle.load(f)
     with open(
         RESULT_PATH.joinpath(
-            f"./hard_eval/experiment_no_args_run3/dat/casa_{house}_predicted.dat"
+            f"./{eval_mode}/experiment_no_args_run3/dat/casa_{house}_predicted.dat"
         ).as_posix(),
         "rb",
     ) as f:
         arr2 = pickle.load(f)
     with open(
         RESULT_PATH.joinpath(
-            f"./hard_eval/experiment_random_assign_run3/dat/casa_{house}_predicted.dat"
+            f"./{eval_mode}/experiment_random_assign_run3/dat/casa_{house}_predicted.dat"
         ).as_posix(),
         "rb",
     ) as f:
         arr3 = pickle.load(f)
     with open(
         RESULT_PATH.joinpath(
-            f"./hard_eval/experiment_synthetic_modelling_run3/dat/casa_{house}_predicted.dat"
+            f"./{eval_mode}/experiment_synthetic_modelling_run3/dat/casa_{house}_predicted.dat"
         ).as_posix(),
         "rb",
     ) as f:
@@ -125,20 +126,32 @@ def plot_consumption(house, day):
 
     plt.tight_layout()
     plt.savefig(
-        PLOTS_PATH.joinpath(f"./predictions_{house}.png").as_posix(),
+        PLOTS_PATH.joinpath(f"./predictions_{house}_{eval_mode}.png").as_posix(),
         bbox_inches="tight",
     )
     plt.close()
 
+def get_args() -> Namespace:
+    parser = ArgumentParser(
+        description="Aggregate and transform house data for individual appliance training.",
+        formatter_class=ArgumentDefaultsHelpFormatter,
+        allow_abbrev=False,
+    )
+    parser.add_argument(
+    "--simple_eval", action="store_true", help="Use data from five eval houses."
+    )
+    parser.add_argument(
+        "--house", type=str, default="andrey", help="House name (default: 'andrey')"
+    )
+    parser.add_argument("--day", type=int, default=1, help="Day number (default: 1)")
 
-parser = argparse.ArgumentParser(
-    description="Plot consumption predictions vs ground truth."
-)
-parser.add_argument(
-    "--house", type=str, default="andrey", help="House name (default: 'andrey')"
-)
-parser.add_argument("--day", type=int, default=1, help="Day number (default: 1)")
+    return parser.parse_args()
 
-args = parser.parse_args()
+def main() -> None:
+    args = get_args()
+    eval_mode = "simple_eval" if args.simple_eval else "hard_eval"
 
-plot_consumption(args.house, args.day)
+    plot_consumption(args.house, args.day, eval_mode)
+
+if __name__ == "__main__":
+    main()
