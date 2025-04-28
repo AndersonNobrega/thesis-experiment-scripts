@@ -8,10 +8,18 @@ from paths import PLOTS_PATH, RESULT_PATH
 
 # Constants
 INPUT_FILES = {
-    "Merged": RESULT_PATH.joinpath("tensorboard/ar_conditioner_train/histgrams/kernel/merged.json").as_posix(),
-    "No Args": RESULT_PATH.joinpath("tensorboard/ar_conditioner_train/histgrams/kernel/no_args.json").as_posix(),
-    "Random Assign": RESULT_PATH.joinpath("tensorboard/ar_conditioner_train/histgrams/kernel/random_assign.json").as_posix(),
-    "Synthetic": RESULT_PATH.joinpath("tensorboard/ar_conditioner_train/histgrams/kernel/synthetic.json").as_posix(),
+    "Merged": RESULT_PATH.joinpath(
+        "tensorboard/ar_conditioner_train/histgrams/kernel/merged.json"
+    ).as_posix(),
+    "No Args": RESULT_PATH.joinpath(
+        "tensorboard/ar_conditioner_train/histgrams/kernel/no_args.json"
+    ).as_posix(),
+    "Random Assign": RESULT_PATH.joinpath(
+        "tensorboard/ar_conditioner_train/histgrams/kernel/random_assign.json"
+    ).as_posix(),
+    "Synthetic": RESULT_PATH.joinpath(
+        "tensorboard/ar_conditioner_train/histgrams/kernel/synthetic.json"
+    ).as_posix(),
 }
 PLOT_FIGSIZE = (16, 12)
 MAX_LIMIT_BUFFER = 0.05  # 5% buffer
@@ -20,10 +28,12 @@ DENSITY_POINTS = 500  # Number of points in smoothed curve
 # Set seaborn theme
 sns.set_theme(style="whitegrid", palette="muted", rc={"axes.edgecolor": "black"})
 
+
 def load_data(file_path):
     with open(file_path, "r") as file:
         data = json.load(file)
     return data[0][2]
+
 
 def extract_samples_from_bins(bin_data):
     """Expand histogram bin data into samples."""
@@ -33,6 +43,7 @@ def extract_samples_from_bins(bin_data):
         center = (start + end) / 2
         samples.extend([center] * int(count))
     return samples
+
 
 def plot_density(input_files, output_file):
     all_samples = []
@@ -47,7 +58,7 @@ def plot_density(input_files, output_file):
 
     # Determine symmetric x-limits centered at 0
     max_abs_x = max(abs(min(all_samples)), abs(max(all_samples)))
-    max_abs_x *= (1 + MAX_LIMIT_BUFFER)  # add buffer
+    max_abs_x *= 1 + MAX_LIMIT_BUFFER  # add buffer
     xlim = (-max_abs_x, max_abs_x)
 
     # Create common x values for density estimation
@@ -83,17 +94,16 @@ def plot_density(input_files, output_file):
         ax.set_ylabel("Density")
         ax.set_xlim(xlim)
         ax.set_ylim(ylim)
-        ax.grid(axis='x', zorder=0)
+        ax.grid(axis="x", zorder=0)
 
     plt.tight_layout()
     plt.savefig(output_file.as_posix(), dpi=300, bbox_inches="tight")
     plt.close()
 
+
 def main():
-    plot_density(
-        input_files=INPUT_FILES,
-        output_file=PLOTS_PATH / "density_kernel.png"
-    )
+    plot_density(input_files=INPUT_FILES, output_file=PLOTS_PATH / "density_kernel.png")
+
 
 if __name__ == "__main__":
     main()

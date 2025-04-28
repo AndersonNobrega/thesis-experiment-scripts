@@ -8,15 +8,24 @@ from paths import PLOTS_PATH, RESULT_PATH
 
 # Constants
 INPUT_FILES = {
-    "Merged": RESULT_PATH.joinpath("tensorboard/ar_conditioner_train/loss/merged.csv").as_posix(),
-    "No Args": RESULT_PATH.joinpath("tensorboard/ar_conditioner_train/loss/no_args.csv").as_posix(),
-    "Random Assign": RESULT_PATH.joinpath("tensorboard/ar_conditioner_train/loss/random_assign.csv").as_posix(),
-    "Synthetic": RESULT_PATH.joinpath("tensorboard/ar_conditioner_train/loss/synthetic.csv").as_posix(),
+    "Merged": RESULT_PATH.joinpath(
+        "tensorboard/ar_conditioner_train/loss/merged.csv"
+    ).as_posix(),
+    "No Args": RESULT_PATH.joinpath(
+        "tensorboard/ar_conditioner_train/loss/no_args.csv"
+    ).as_posix(),
+    "Random Assign": RESULT_PATH.joinpath(
+        "tensorboard/ar_conditioner_train/loss/random_assign.csv"
+    ).as_posix(),
+    "Synthetic": RESULT_PATH.joinpath(
+        "tensorboard/ar_conditioner_train/loss/synthetic.csv"
+    ).as_posix(),
 }
 PLOT_FIGSIZE = (12, 8)
 OUTPUT_FILE = PLOTS_PATH / "training_loss_ar_conditioner.png"
 
 sns.set_theme(style="whitegrid", palette="muted", rc={"axes.edgecolor": "black"})
+
 
 def plot_overlapped_lines(input_files: List[Path], output_file: Path):
     plt.figure(figsize=PLOT_FIGSIZE)
@@ -32,14 +41,13 @@ def plot_overlapped_lines(input_files: List[Path], output_file: Path):
     plt.legend()
     plt.grid(axis="x")
     plt.tight_layout()
-    plt.savefig(output_file.as_posix(), dpi=300, bbox_inches='tight')
+    plt.savefig(output_file.as_posix(), dpi=300, bbox_inches="tight")
     plt.close
 
+
 def main():
-    plot_overlapped_lines(
-        input_files=INPUT_FILES,
-        output_file=OUTPUT_FILE
-    )
+    plot_overlapped_lines(input_files=INPUT_FILES, output_file=OUTPUT_FILE)
+
 
 if __name__ == "__main__":
     main()

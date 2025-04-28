@@ -3,17 +3,21 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 
 # Constants
-INPUT_FILE_PATH = "/home/anderson/temp/individual_appliances/residencial/train_ar_condicionado.dat"
+INPUT_FILE_PATH = (
+    "/home/anderson/temp/individual_appliances/residencial/train_ar_condicionado.dat"
+)
 PLOT_FIGSIZE = (12, 8)
 MAX_Y_LIMIT_BUFFER = 200
 
 sns.set_theme(style="whitegrid", palette="muted", rc={"axes.edgecolor": "black"})
+
 
 # Load data from pickle file
 def load_data(file_path):
     with open(file_path, "rb") as file:
         data = pickle.load(file)
     return data
+
 
 # Plotting the data
 def plot_data(arr):
@@ -36,10 +40,12 @@ def plot_data(arr):
 
     plt.show()
 
+
 def main():
     arr = load_data(INPUT_FILE_PATH)
     print(f"Data Shape: {arr.shape}")
     plot_data(arr)
+
 
 if __name__ == "__main__":
     main()

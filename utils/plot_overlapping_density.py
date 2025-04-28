@@ -7,10 +7,18 @@ from paths import PLOTS_PATH, RESULT_PATH
 
 # Constants
 INPUT_FILES = {
-    "Merged": RESULT_PATH.joinpath("tensorboard/ar_conditioner_train/histgrams/kernel/merged.json").as_posix(),
-    "No Args": RESULT_PATH.joinpath("tensorboard/ar_conditioner_train/histgrams/kernel/no_args.json").as_posix(),
-    "Random Assign": RESULT_PATH.joinpath("tensorboard/ar_conditioner_train/histgrams/kernel/random_assign.json").as_posix(),
-    "Synthetic": RESULT_PATH.joinpath("tensorboard/ar_conditioner_train/histgrams/kernel/synthetic.json").as_posix(),
+    "Merged": RESULT_PATH.joinpath(
+        "tensorboard/ar_conditioner_train/histgrams/kernel/merged.json"
+    ).as_posix(),
+    "No Args": RESULT_PATH.joinpath(
+        "tensorboard/ar_conditioner_train/histgrams/kernel/no_args.json"
+    ).as_posix(),
+    "Random Assign": RESULT_PATH.joinpath(
+        "tensorboard/ar_conditioner_train/histgrams/kernel/random_assign.json"
+    ).as_posix(),
+    "Synthetic": RESULT_PATH.joinpath(
+        "tensorboard/ar_conditioner_train/histgrams/kernel/synthetic.json"
+    ).as_posix(),
 }
 PLOT_FIGSIZE = (12, 8)
 X_LIMIT_BUFFER = 0.05
@@ -18,11 +26,13 @@ DENSITY_POINTS = 500
 
 sns.set_theme(style="whitegrid", palette="muted", rc={"axes.edgecolor": "black"})
 
+
 def load_data(file_path):
     """Load histogram data from a JSON file."""
     with open(file_path, "r") as file:
         data = json.load(file)
     return data[0][2]
+
 
 def expand_bin_data(bin_data):
     """Expand bin histogram data into raw samples (approximate)."""
@@ -32,6 +42,7 @@ def expand_bin_data(bin_data):
         samples.extend([center] * int(count))
     return samples
 
+
 def compute_kde(samples, x_values, normalize=True):
     """Compute the Kernel Density Estimation (KDE) over x_values."""
     kde = gaussian_kde(samples)
@@ -39,6 +50,7 @@ def compute_kde(samples, x_values, normalize=True):
     if normalize:
         density /= density.max()
     return density
+
 
 def plot_density(input_files, output_file, normalize=True, logscale=False):
     """Plot overlapping density plots for multiple datasets."""
@@ -77,7 +89,7 @@ def plot_density(input_files, output_file, normalize=True, logscale=False):
     else:
         ax.set_ylabel("Density", fontsize=12)
         if logscale:
-            ax.set_yscale('log')
+            ax.set_yscale("log")
 
     ax.set_xlabel("Kernel Weight Value", fontsize=12)
     title = "Overlapping Density Plots"
@@ -92,13 +104,15 @@ def plot_density(input_files, output_file, normalize=True, logscale=False):
     plt.savefig(output_file.as_posix(), dpi=300, bbox_inches="tight")
     plt.close()
 
+
 def main():
     plot_density(
         input_files=INPUT_FILES,
         output_file=PLOTS_PATH / "overlapping_density_kernel_non_normalized.png",
         normalize=False,
-        logscale=False
+        logscale=False,
     )
+
 
 if __name__ == "__main__":
     main()

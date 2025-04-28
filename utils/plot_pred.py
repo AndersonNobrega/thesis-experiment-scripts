@@ -1,4 +1,3 @@
-
 import pickle
 import matplotlib.pyplot as plt
 import seaborn as sns
@@ -10,6 +9,7 @@ from paths import PLOTS_PATH, RESULT_PATH
 
 sns.set_theme(style="whitegrid", palette="muted", rc={"axes.edgecolor": "black"})
 PLOT_FIGSIZE = (19.2, 10.8)
+
 
 def plot_consumption(house: str, day: int, eval_mode: str) -> None:
     # Load ground truth
@@ -133,6 +133,7 @@ def plot_consumption(house: str, day: int, eval_mode: str) -> None:
     )
     plt.close()
 
+
 def get_args() -> Namespace:
     parser = ArgumentParser(
         description="Aggregate and transform house data for individual appliance training.",
@@ -140,7 +141,7 @@ def get_args() -> Namespace:
         allow_abbrev=False,
     )
     parser.add_argument(
-    "--simple_eval", action="store_true", help="Use data from five eval houses."
+        "--simple_eval", action="store_true", help="Use data from five eval houses."
     )
     parser.add_argument(
         "--house", type=str, default="andrey", help="House name (default: 'andrey')"
@@ -149,11 +150,13 @@ def get_args() -> Namespace:
 
     return parser.parse_args()
 
+
 def main() -> None:
     args = get_args()
     eval_mode = "simple_eval" if args.simple_eval else "hard_eval"
 
     plot_consumption(args.house, args.day, eval_mode)
+
 
 if __name__ == "__main__":
     main()
