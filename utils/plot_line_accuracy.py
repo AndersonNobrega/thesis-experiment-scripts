@@ -11,7 +11,7 @@ INPUT_FILES = {
     "Merged": RESULT_PATH.joinpath(
         "tensorboard/ar_conditioner_train/acc/merged.csv"
     ).as_posix(),
-    "No Args": RESULT_PATH.joinpath(
+    "No Augment": RESULT_PATH.joinpath(
         "tensorboard/ar_conditioner_train/acc/no_args.csv"
     ).as_posix(),
     "Random Assign": RESULT_PATH.joinpath(

@@ -23,3 +23,10 @@ python3 utils/plot_histogram.py
 python3 utils/plot_line_accuracy.py
 
 python3 utils/plot_line_loss.py
+
+python3 utils/plot_acc_average.py
+python3 utils/plot_acc_average.py --simple_eval
+
+python3 utils/plot_disaggregation_example.py
+
+python3 utils/plot_gdp_eletricty_eia.py

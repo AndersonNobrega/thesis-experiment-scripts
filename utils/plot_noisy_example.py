@@ -5,10 +5,9 @@ import numpy as np
 import seaborn as sns
 from statsmodels.nonparametric.smoothers_lowess import lowess
 
-from paths import RESULT_PATH
+from paths import RESULT_PATH, PLOTS_PATH
 
-custom = {"axes.edgecolor": "black"}
-sns.set_style("whitegrid", rc=custom)
+sns.set_theme(style="whitegrid", palette="muted", rc={"axes.edgecolor": "black"})
 
 file = open(
     RESULT_PATH.joinpath(
@@ -16,6 +15,8 @@ file = open(
     ).as_posix(),
     "rb",
 )
+
+OUTPUT_FILE = PLOTS_PATH / "noisy_example.png"
 
 arr = pickle.load(file)
 arr_size = arr[9500:10000, 4, 0].shape[0]
@@ -28,6 +29,9 @@ filtered = lowess(
 filtered_values = filtered[:, 1]
 filtered_values[filtered_values < 30] = 0
 
+noisy_signal = arr[9500:10000, 4, 0] + gaussian_noise
+noisy_signal[noisy_signal > 200] = 150
+
 fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(12, 8))
 
 fig.supxlabel("Minutes")
@@ -35,19 +39,19 @@ fig.supylabel("Power Consumption (W)")
 
 ax1.set_ylim(-5, max_value)
 ax1.grid(axis="x")
-ax1.plot(filtered_values, color="black")
+ax1.plot(filtered_values, color="#181a1c")
 
 ax2.set_ylim(-5, max_value)
 ax2.grid(axis="x")
-ax2.plot(arr[9500:10000, 4, 0] + gaussian_noise, color="black")
+ax2.plot(noisy_signal, color="#181a1c")
 
 plt.subplots_adjust(left=0.09, wspace=0.4)
 
 arrowprops = dict(arrowstyle="->", linewidth=2, color="red")
 
 plt.text(
-    -145,
-    int(max_value / 2) + 10,
+    -140,
+    int(max_value / 2) - 15,
     "Noise Insertion",
     ha="center",
     bbox={
@@ -58,4 +62,5 @@ plt.text(
     },
 )
 
-plt.savefig("noisy_example.png", bbox_inches="tight")
+plt.savefig(OUTPUT_FILE.as_posix(), dpi=300, bbox_inches="tight")
+plt.close()

@@ -51,7 +51,7 @@ def plot_consumption(house: str, day: int, eval_mode: str) -> None:
     ) as f:
         arr4 = pickle.load(f)
 
-    labels = ["Merged", "No Args", "Random Assign", "Synthetic Modelling"]
+    labels = ["Merged", "No Augment", "Random Assign", "Synthetic Modelling"]
     arrays = [arr1, arr2, arr3, arr4]
 
     indexes = [2, 3, 4, 5]
@@ -114,6 +114,7 @@ def plot_consumption(house: str, day: int, eval_mode: str) -> None:
         ax.set_title(f"{index_labels[idx]}")
         ax.set_xlabel("Sample")
         ax.set_ylabel("Consumption (W)")
+        ax.grid(axis="x")
         ax.tick_params(axis="x", rotation=20)
 
     handles, labels = ax.get_legend_handles_labels()

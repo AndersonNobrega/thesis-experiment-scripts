@@ -11,7 +11,7 @@ INPUT_FILES = {
     "Merged": RESULT_PATH.joinpath(
         "tensorboard/ar_conditioner_train/histgrams/kernel/merged.json"
     ).as_posix(),
-    "No Args": RESULT_PATH.joinpath(
+    "No Augment": RESULT_PATH.joinpath(
         "tensorboard/ar_conditioner_train/histgrams/kernel/no_args.json"
     ).as_posix(),
     "Random Assign": RESULT_PATH.joinpath(
