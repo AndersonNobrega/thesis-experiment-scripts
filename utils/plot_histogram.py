@@ -2,30 +2,35 @@ import json
 from pathlib import Path
 from typing import List
 import matplotlib.pyplot as plt
+from matplotlib.transforms import Bbox
 import seaborn as sns
 
-from paths import PLOTS_PATH, RESULT_PATH
+from paths import PLOTS_PATH, RESULT_PATH, CONF_PATH
+
+style_path = CONF_PATH / "paper.mplstyle"
+sns.set_theme(style="whitegrid", palette="muted", rc={"axes.edgecolor": "black"})
+plt.style.use(style_path)
 
 # Constants
 INPUT_FILES = {
-    "Merged": RESULT_PATH.joinpath(
-        "tensorboard/ar_conditioner_train/histgrams/kernel/merged.json"
-    ).as_posix(),
-    "No Augment": RESULT_PATH.joinpath(
+    "Experiment A": RESULT_PATH.joinpath(
         "tensorboard/ar_conditioner_train/histgrams/kernel/no_args.json"
     ).as_posix(),
-    "Random Assign": RESULT_PATH.joinpath(
+    "Experiment B": RESULT_PATH.joinpath(
         "tensorboard/ar_conditioner_train/histgrams/kernel/random_assign.json"
     ).as_posix(),
-    "Synthetic": RESULT_PATH.joinpath(
+    "Experiment C": RESULT_PATH.joinpath(
         "tensorboard/ar_conditioner_train/histgrams/kernel/synthetic.json"
     ).as_posix(),
+    "Experiment D": RESULT_PATH.joinpath(
+        "tensorboard/ar_conditioner_train/histgrams/kernel/merged.json"
+    ).as_posix(),
 }
-PLOT_FIGSIZE = (16, 12)
+pt = 1.0 / 72.27
+golden = (1 + 5**0.5) / 2
+fig_width = 441.0 * pt
+PLOT_FIGSIZE = (fig_width, fig_width / golden)
 MAX_LIMIT_BUFFER = 0.05  # 5% buffer
-
-# Set seaborn theme
-sns.set_theme(style="whitegrid", palette="muted", rc={"axes.edgecolor": "black"})
 
 
 def load_data(file_path):
@@ -65,21 +70,30 @@ def plot_histograms(input_files: List[Path], output_file: Path):
     ylim = (0, max_y * (1 + MAX_LIMIT_BUFFER))
 
     # Plotting
-    fig, axes = plt.subplots(2, 2, figsize=PLOT_FIGSIZE)
+    fig, axes = plt.subplots(2, 2, figsize=PLOT_FIGSIZE, constrained_layout=True)
     axes = axes.flatten()
 
     for ax, (title, (bin_centers, values)) in zip(axes, processed_data.items()):
         ax.fill_between(bin_centers, values, color="lightblue", alpha=0.6)
         ax.plot(bin_centers, values, linestyle="-", marker="")
         ax.set_title(title)
-        ax.set_xlabel("Values")
-        ax.set_ylabel("Frequency")
         ax.set_xlim(xlim)
         ax.set_ylim(ylim)
-        ax.grid(axis="x", zorder=0)
 
-    plt.tight_layout()
-    plt.savefig(output_file.as_posix(), dpi=300, bbox_inches="tight")
+    bbox = axes[0].get_position()
+    for ax in axes[1:]:
+        bbox = Bbox.union([bbox, ax.get_position()])
+
+    fig.text(bbox.x0 + bbox.width / 2, -0.02, "Values", ha="center", va="center")
+    fig.text(
+        -0.02,
+        bbox.y0 + bbox.height / 2,
+        "Density",
+        ha="center",
+        va="center",
+        rotation="vertical",
+    )
+    fig.savefig(output_file.as_posix(), dpi=300, bbox_inches="tight")
     plt.close()
 
 

@@ -1,14 +1,23 @@
 #!/bin/bash
 set -e  # Exit immediately if a command exits with a non-zero status
 
-python3 utils/plot_pred.py --house "andrey"
+python3 utils/plot_pred.py --house "andrey" --day 3
 python3 utils/plot_pred.py --house "diego"
 
-python3 utils/plot_pred.py --house "andrey" --simple_eval
+python3 utils/plot_pred.py --house "andrey" --simple_eval --day 3
 python3 utils/plot_pred.py --house "anderson" --simple_eval
 python3 utils/plot_pred.py --house "diego" --simple_eval
 python3 utils/plot_pred.py --house "igor" --simple_eval
 python3 utils/plot_pred.py --house "leandro" --simple_eval
+
+python3 utils/plot_individual_pred.py --house "andrey"
+python3 utils/plot_individual_pred.py --house "diego"
+
+python3 utils/plot_individual_pred.py --house "andrey" --simple_eval
+python3 utils/plot_individual_pred.py --house "anderson" --simple_eval
+python3 utils/plot_individual_pred.py --house "diego" --simple_eval
+python3 utils/plot_individual_pred.py --house "igor" --simple_eval
+python3 utils/plot_individual_pred.py --house "leandro" --simple_eval
 
 python3 utils/plot_papers_tendencia.py
 

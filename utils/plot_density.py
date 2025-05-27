@@ -1,32 +1,38 @@
 import json
+from matplotlib.transforms import Bbox
 import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sns
 from scipy.stats import gaussian_kde
+from paths import PLOTS_PATH, RESULT_PATH, CONF_PATH
 
-from paths import PLOTS_PATH, RESULT_PATH
+style_path = CONF_PATH / "paper.mplstyle"
+sns.set_theme(style="whitegrid", palette="muted", rc={"axes.edgecolor": "black"})
+plt.style.use(style_path)
 
 # Constants
 INPUT_FILES = {
-    "Merged": RESULT_PATH.joinpath(
-        "tensorboard/ar_conditioner_train/histgrams/kernel/merged.json"
-    ).as_posix(),
-    "No Augment": RESULT_PATH.joinpath(
+    "Experiment A": RESULT_PATH.joinpath(
         "tensorboard/ar_conditioner_train/histgrams/kernel/no_args.json"
     ).as_posix(),
-    "Random Assign": RESULT_PATH.joinpath(
+    "Experiment B": RESULT_PATH.joinpath(
         "tensorboard/ar_conditioner_train/histgrams/kernel/random_assign.json"
     ).as_posix(),
-    "Synthetic": RESULT_PATH.joinpath(
+    "Experiment C": RESULT_PATH.joinpath(
         "tensorboard/ar_conditioner_train/histgrams/kernel/synthetic.json"
     ).as_posix(),
+    "Experiment D": RESULT_PATH.joinpath(
+        "tensorboard/ar_conditioner_train/histgrams/kernel/merged.json"
+    ).as_posix(),
 }
-PLOT_FIGSIZE = (16, 12)
+
+pt = 1.0 / 72.27
+golden = (1 + 5**0.5) / 2
+fig_width = 441.0 * pt
+fig_height = fig_width / golden
+PLOT_FIGSIZE = (fig_width, fig_height)
 MAX_LIMIT_BUFFER = 0.05  # 5% buffer
 DENSITY_POINTS = 500  # Number of points in smoothed curve
-
-# Set seaborn theme
-sns.set_theme(style="whitegrid", palette="muted", rc={"axes.edgecolor": "black"})
 
 
 def load_data(file_path):
@@ -65,12 +71,14 @@ def plot_density(input_files, output_file):
     x_values = np.linspace(*xlim, DENSITY_POINTS)
 
     # Plotting
-    fig, axes = plt.subplots(2, 2, figsize=PLOT_FIGSIZE)
+    fig, axes = plt.subplots(
+        2, 2, figsize=PLOT_FIGSIZE, sharex=True, sharey=True, constrained_layout=True
+    )
     axes = axes.flatten()
 
     max_density = 0
-
     densities = {}
+
     # Calculate densities first
     for title, samples in processed_data.items():
         if len(samples) > 1:
@@ -85,19 +93,30 @@ def plot_density(input_files, output_file):
     ylim = (0, max_density * (1 + MAX_LIMIT_BUFFER))
 
     # Now plot
-    for ax, (title, density) in zip(axes, densities.items()):
+    for i, (ax, (title, density)) in enumerate(zip(axes, densities.items())):
         ax.fill_between(x_values, density, color="lightblue", alpha=0.6)
         ax.plot(x_values, density, linestyle="-")
         ax.axvline(0, color="black", linestyle="--", linewidth=1)
         ax.set_title(title)
-        ax.set_xlabel("Values")
-        ax.set_ylabel("Density")
         ax.set_xlim(xlim)
         ax.set_ylim(ylim)
-        ax.grid(axis="x", zorder=0)
 
-    plt.tight_layout()
-    plt.savefig(output_file.as_posix(), dpi=300, bbox_inches="tight")
+    bbox = axes[0].get_position()
+    for ax in axes[1:]:
+        bbox = Bbox.union([bbox, ax.get_position()])
+
+    fig.text(
+        bbox.x0 + bbox.width / 2, -0.02, "Kernel Weights", ha="center", va="center"
+    )
+    fig.text(
+        -0.02,
+        bbox.y0 + bbox.height / 2,
+        "Density",
+        ha="center",
+        va="center",
+        rotation="vertical",
+    )
+    fig.savefig(output_file.as_posix(), dpi=300, bbox_inches="tight")
     plt.close()
 
 

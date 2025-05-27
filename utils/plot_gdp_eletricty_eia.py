@@ -1,12 +1,19 @@
 import matplotlib.pyplot as plt
 import seaborn as sns
 import pandas as pd
+from paths import PLOTS_PATH, CONF_PATH
 
-from paths import PLOTS_PATH
-
+style_path = CONF_PATH / "paper.mplstyle"
 sns.set_theme(style="whitegrid", palette="muted", rc={"axes.edgecolor": "black"})
+plt.style.use(style_path)
+plt.rcParams.update({"xtick.bottom": False})
 
 OUTPUT_FILE = PLOTS_PATH / "gdp_eletricity_eia_2022.png"
+
+pt = 1.0 / 72.27
+golden = (1 + 5**0.5) / 2
+fig_width = 441.0 * pt
+PLOT_FIGSIZE = (fig_width, fig_width / golden)
 
 data_historic = {
     "GDP": [
@@ -112,8 +119,7 @@ data_historic = {
 
 df = pd.DataFrame.from_dict(data_historic)
 
-plt.figure(figsize=(10, 6))
-plt.grid(axis="x")
+plt.figure(figsize=PLOT_FIGSIZE, constrained_layout=True)
 
 line_plot = sns.lineplot(
     data=df[df["Year"] < "2023"],
@@ -121,9 +127,15 @@ line_plot = sns.lineplot(
     y="GDP",
     color="#3b719f",
     label="GDP (Purchasing Power Parity)",
+    lw=1.1,
 )
 sns.lineplot(
-    data=df[df["Year"] >= "2022"], x="Year", y="GDP", linestyle="dashed", color="#3b719f"
+    data=df[df["Year"] >= "2022"],
+    x="Year",
+    y="GDP",
+    linestyle="dashed",
+    color="#3b719f",
+    lw=1.1,
 )
 sns.lineplot(
     data=df[df["Year"] < "2023"],
@@ -131,14 +143,18 @@ sns.lineplot(
     y="EG",
     label="Electricity Generation",
     color="#cb4c4e",
+    lw=1.1,
 )
 sns.lineplot(
-    data=df[df["Year"] >= "2022"], x="Year", y="EG", linestyle="dashed", color="#cb4c4e"
+    data=df[df["Year"] >= "2022"],
+    x="Year",
+    y="EG",
+    linestyle="dashed",
+    color="#cb4c4e",
+    lw=1.1,
 )
 
 line_plot.set_ylabel("Growth")
-
-line_plot.text(7.5, 105, "Projections", fontdict={"size": 16})
 
 for ind, label in enumerate(line_plot.get_xticklabels()):
     if ind % 5 == 0:  # every 10th label is kept
@@ -147,5 +163,6 @@ for ind, label in enumerate(line_plot.get_xticklabels()):
         label.set_visible(False)
 
 line_plot.axvline(x="2022", ymin=0, ymax=1, color="black")
+plt.legend(loc="upper center", frameon=True)
 plt.savefig(OUTPUT_FILE.as_posix(), dpi=300, bbox_inches="tight")
 plt.close()

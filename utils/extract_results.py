@@ -1,8 +1,9 @@
 import argparse
 import json
 import re
-from statistics import mean
 from pathlib import Path
+
+import numpy as np
 
 # List of subscenario identifiers to collect
 SUBSCENARIOS = [
@@ -82,7 +83,7 @@ def process_file(txt_path: Path) -> dict:
 
     averages = {
         sub: {
-            metric: round(mean(values), 2) if values else None
+            metric: round(np.std(values), 2) if values else None
             for metric, values in data.items()
         }
         for sub, data in metrics.items()

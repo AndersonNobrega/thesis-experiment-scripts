@@ -1,12 +1,21 @@
 import matplotlib.pyplot as plt
 import numpy as np
 import seaborn as sns
-from paths import PLOTS_PATH
+from paths import PLOTS_PATH, CONF_PATH
+
+style_path = CONF_PATH / "paper.mplstyle"
+sns.set_theme(style="whitegrid", palette="muted", rc={"axes.edgecolor": "black"})
+plt.style.use(style_path)
 
 # Constants
 YEARS = tuple(str(year) for year in range(2012, 2025))
 WIDTH = 0.7
 OUTPUT_FILE = PLOTS_PATH / "tendencia_papers.png"
+
+pt = 1.0 / 72.27
+golden = (1 + 5**0.5) / 2
+fig_width = 441.0 * pt
+PLOT_FIGSIZE = (fig_width, fig_width / golden)
 
 # Weight counts per category
 WEIGHT_COUNTS = {
@@ -25,8 +34,6 @@ WEIGHT_COUNTS = {
     "Reviews": np.array([0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 1, 0, 2]),
 }
 
-sns.set_theme(style="whitegrid", palette="muted", rc={"axes.edgecolor": "black"})
-
 
 def calculate_total_weight(weight_counts):
     total = sum(sum(weight_counts[key]) for key in weight_counts)
@@ -36,8 +43,7 @@ def calculate_total_weight(weight_counts):
 
 
 def create_stacked_bar_plot(years, weight_counts, width, output_path):
-    _, ax = plt.subplots(figsize=(10, 6))
-    ax.grid(True, zorder=0)
+    fig, ax = plt.subplots(figsize=PLOT_FIGSIZE, constrained_layout=True)
     bottom = np.zeros(len(years))
 
     for label, weight_count in weight_counts.items():
@@ -49,17 +55,16 @@ def create_stacked_bar_plot(years, weight_counts, width, output_path):
             edgecolor="black",
             bottom=bottom,
             zorder=3,
+            linewidth=0.5,
         )
         bottom += weight_count
 
     ax.set_yticks([0, 2, 4, 6, 8, 10, 12, 14, 16, 18, 20])
     ax.set_xlabel("Year")
     ax.set_ylabel("Articles")
-    ax.grid(axis="x")
     ax.legend(loc="upper left")
 
-    plt.tight_layout()
-    plt.savefig(output_path.as_posix(), dpi=300, bbox_inches="tight")
+    fig.savefig(output_path.as_posix(), dpi=300, bbox_inches="tight")
     plt.close()
 
 

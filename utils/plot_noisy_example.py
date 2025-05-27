@@ -5,9 +5,11 @@ import numpy as np
 import seaborn as sns
 from statsmodels.nonparametric.smoothers_lowess import lowess
 
-from paths import RESULT_PATH, PLOTS_PATH
+from paths import RESULT_PATH, PLOTS_PATH, CONF_PATH
 
+style_path = CONF_PATH / "paper.mplstyle"
 sns.set_theme(style="whitegrid", palette="muted", rc={"axes.edgecolor": "black"})
+plt.style.use(style_path)
 
 file = open(
     RESULT_PATH.joinpath(
@@ -15,6 +17,11 @@ file = open(
     ).as_posix(),
     "rb",
 )
+
+pt = 1.0 / 72.27
+golden = (1 + 5**0.5) / 2
+fig_width = 441.0 * pt
+PLOT_FIGSIZE = (fig_width, fig_width / golden)
 
 OUTPUT_FILE = PLOTS_PATH / "noisy_example.png"
 
@@ -32,17 +39,15 @@ filtered_values[filtered_values < 30] = 0
 noisy_signal = arr[9500:10000, 4, 0] + gaussian_noise
 noisy_signal[noisy_signal > 200] = 150
 
-fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(12, 8))
+fig, (ax1, ax2) = plt.subplots(1, 2, figsize=PLOT_FIGSIZE)
 
 fig.supxlabel("Minutes")
 fig.supylabel("Power Consumption (W)")
 
 ax1.set_ylim(-5, max_value)
-ax1.grid(axis="x")
 ax1.plot(filtered_values, color="#181a1c")
 
 ax2.set_ylim(-5, max_value)
-ax2.grid(axis="x")
 ax2.plot(noisy_signal, color="#181a1c")
 
 plt.subplots_adjust(left=0.09, wspace=0.4)

@@ -2,9 +2,16 @@ from argparse import ArgumentDefaultsHelpFormatter, ArgumentParser, Namespace
 import matplotlib.pyplot as plt
 import seaborn as sns
 import pandas as pd
-from paths import RESULT_PATH, PLOTS_PATH
+from paths import RESULT_PATH, PLOTS_PATH, CONF_PATH
 
+style_path = CONF_PATH / "paper.mplstyle"
 sns.set_theme(style="whitegrid", palette="muted", rc={"axes.edgecolor": "black"})
+plt.style.use(style_path)
+
+pt = 1.1 / 72.27
+golden = (1 + 5**0.5) / 2
+fig_width = 441.01772 * pt
+PLOT_FIGSIZE = (fig_width, fig_width / golden)
 
 
 def get_args() -> Namespace:
@@ -19,17 +26,16 @@ def get_args() -> Namespace:
 
 
 def plot_bar_chart(data: pd.DataFrame, output_file) -> None:
-    plt.figure(figsize=(12, 8))
-    plt.grid(axis="x")
+    plt.figure(figsize=PLOT_FIGSIZE, constrained_layout=True)
     ax = sns.barplot(data=data, x="Experimento", y="Acuracia", hue="Aparelho")
     for container in ax.containers:
-        ax.bar_label(container)
+        ax.bar_label(container, fontsize=8)
 
-    plt.ylabel("Acurácia (%)")
+    plt.ylabel("Estimated Accuracy")
+    plt.xlabel("Experiment")
     plt.ylim(0, 100)
-    plt.legend()
-    plt.tight_layout()
-    plt.savefig(output_file, bbox_inches="tight")
+    plt.legend(loc="upper left")
+    plt.savefig(output_file, dpi=300, bbox_inches="tight")
     plt.close()
 
 
