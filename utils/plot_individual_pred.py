@@ -39,7 +39,7 @@ def plot_consumption(house: str, day: int, eval_mode: str) -> None:
     labels = ["A", "B", "C", "D"]
 
     indexes = [2, 3, 4, 5]
-    index_labels = {2: "Air Conditioner", 3: "Shower", 4: "Fridge", 5: "Other"}
+    index_labels = {2: "Air Conditioner", 3: "Electric Shower", 4: "Refrigerator", 5: "Other"}
     ground_truth_color = "#333333"
 
     for idx in indexes:

@@ -23,31 +23,6 @@ PATTERNS = {
     "total_ar_condicionado": re.compile(r"appliance ar_condicionado: ([\d\.]+)%"),
     "total_chuveiro": re.compile(r"appliance chuveiro: ([\d\.]+)%"),
     "total_refrigerador": re.compile(r"appliance refrigerador: ([\d\.]+)%"),
-    "f1score_ar_condicionado": re.compile(
-        r"appliance ar_condicionado - precision: [\d\.]+%, recall: [\d\.]+%, f1score: ([\d\.]+)%"
-    ),
-    "f1score_chuveiro": re.compile(
-        r"appliance chuveiro - precision: [\d\.]+%, recall: [\d\.]+%, f1score: ([\d\.]+)%"
-    ),
-    "f1score_refrigerador": re.compile(
-        r"appliance refrigerador - precision: [\d\.]+%, recall: [\d\.]+%, f1score: ([\d\.]+)%"
-    ),
-    "precision_ar_condicionado": re.compile(
-        r"appliance ar_condicionado - precision: ([\d\.]+)%"
-    ),
-    "precision_chuveiro": re.compile(r"appliance chuveiro - precision: ([\d\.]+)%"),
-    "precision_refrigerador": re.compile(
-        r"appliance refrigerador - precision: ([\d\.]+)%"
-    ),
-    "recall_ar_condicionado": re.compile(
-        r"appliance ar_condicionado - precision: [\d\.]+%, recall: ([\d\.]+)%"
-    ),
-    "recall_chuveiro": re.compile(
-        r"appliance chuveiro - precision: [\d\.]+%, recall: ([\d\.]+)%"
-    ),
-    "recall_refrigerador": re.compile(
-        r"appliance refrigerador - precision: [\d\.]+%, recall: ([\d\.]+)%"
-    ),
 }
 
 
@@ -83,7 +58,7 @@ def process_file(txt_path: Path) -> dict:
 
     averages = {
         sub: {
-            metric: round(np.std(values), 2) if values else None
+            metric: values if values else None
             for metric, values in data.items()
         }
         for sub, data in metrics.items()
